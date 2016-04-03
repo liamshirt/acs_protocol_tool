@@ -1,0 +1,11 @@
+<widget id="com.example.hello" version="0.0.1">
+        <name>ACS Protocol Tool</name>
+        <description>
+            A Tool to aid implementation of the BHI ACS protocol.
+        </description>
+        <author email="liam.hirt@googlemail.com">
+            Liam Hirt
+        </author>
+        <content src="index.html" />
+        <access origin="*" />
+    </widget>
