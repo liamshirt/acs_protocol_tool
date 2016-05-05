@@ -1,0 +1,203 @@
+<!doctype html>
+<html>
+
+	<head>
+		<title>ACS Protocol Tool</title>
+		<meta name="description" content="App for ACS algorithm">
+		<meta name="author" content="Liam Hirt">		
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script TYPE="text/javascript">
+// function to ensure only numbers ar entered in white space boxes
+function numbersonly(myfield, e, dec) {
+    var key;
+    var keychar;
+    if (window.event) {
+        key = window.event.keyCode;
+    } else if (e) {
+        key = e.which;
+    } else {
+        return true;
+    }
+    keychar = String.fromCharCode(key);
+    if ((key === null) || (key === 0) || (key === 8) || (key === 9) || (key === 13) || (key === 27)) {
+        return true;
+    } else if (("0123456789").indexOf(keychar) > -1) {
+        return true;
+    } else if (dec && (keychar === ".")) {
+        myfield.form.elements[dec].focus();
+        return false;
+    } else {
+        return false;
+    }
+}
+</script>
+	</head>
+	<header>
+	<h1>ACS Protocol Tool</h1>
+	</header>
+	<body style= "padding: 12px; width: 50%; margin: auto; padding-top; 12px">
+        <form id='nameform'>
+<table  width="100%" border="0" cellpadding="3" cellspacing="1" bgcolor="#FFFFFF">
+		<div class='form-uname'>
+	  <h2>ECG changes</h2>
+     		ECG changes: <select id='ecgField' name='ecgchanges'>
+  				<option value="none">None</option>
+  				<option value="stdown">Static ECG changes</option>
+  				<option value="stchng">Dynamic changes</option>
+  				<option value="stup">ST elevation</option>
+			</select>
+	  <h2>Baseline troponin</h2>	
+     		<lable id='cptLable' for='nameField'>Hours since chest pain:</lable>
+    		<input id='cptField' type='text' onKeyPress="return numbersonly(this, event)"></input>
+		</br>
+		<lable id='fttLable' for='nameField'>Baseline troponin result:</lable>
+                <input id='fttField' type='text' maxlength='25' onKeyPress="return numbersonly(this, event)"></input>
+     </br><h2>1 hour troponin</h2>
+        <lable id='sttLable' for='nameField'>1 hour troponin result:</lable>
+    		<input id='sttField' type='text' maxlength='25' onKeyPress="return numbersonly(this, event)"></input>
+<h2>Risk stratification</h2>
+     		Age: <select id='age' name='age'>
+  				<option value="">less than 30</option>
+  				<option value="8">30-39</option>
+  				<option value="25">40-49</option>
+  				<option value="41">50-59</option>
+				<option value="58">60-69</option>
+				<option value="75">70-79</option>
+				<option value="91">80-89</option>
+      			<option value="100">90 or more</option>
+			</select></br>
+			Heart rate: <select id='heartrate' name='heartrate'>
+  				<option value="0">less than 50</option>
+  				<option value="3">50-69</option>
+  				<option value="09">70-89</option>
+  				<option value="15">90-109</option>
+				<option value="24">110-149</option>
+				<option value="38">150-199</option>
+				<option value="46">200 or more</option>
+			</select></br>
+			Systolic BP: <select id='bloodpress' name='bloodpress'>
+  				<option value="58">less than 80</option>
+  				<option value="53">80-99</option>
+  				<option value="43">100-119</option>
+  				<option value="34">120-139</option>
+				<option value="24">140-159</option>
+				<option value="10">160-199</option>
+				<option value="0">200 or more</option>
+			</select></br>
+			Killip class: <select id='killip' name='killip'>
+  				<option value="0">I (no heart Failure)</option>
+  				<option value="20">II (Basal Crackles)</option>
+  				<option value="39">III (Crackle throughout lungs)</option>
+  				<option value="59">IV (Cardiogenic shock)</option>
+			</select></br>
+			Serum creatinine: <select id='creat' name='creat'>
+  				<option value="1">0-34</option>
+  				<option value="4">35-70</option>
+  				<option value="7">71-105</option>
+  				<option value="10">106-140</option>
+				<option value="13">141-176</option>
+				<option value="21">177-353</option>
+				<option value="28">354 or more</option>
+			</select></br>
+			Cardiac arrest at admission: <select id='ooha' name='ooha'>
+  				<option value="0">No</option>
+  				<option value="39">Yes</option>
+			</select></br>
+</br></br>
+		<div class='form-sub'>
+   		 <button id='subButton' type='button'>Submit</button>
+		</div>
+</table>
+		</form>
+<h2>Outcome:
+		<div>
+			<p id='onehour'></p>
+        </div>
+		<div>
+    		<p id='result'></p>
+		</div>
+		<div>
+			<p id='advice'></p>
+        </div>
+		<div>
+			<p id='advice2'></p></h2>
+        </div>
+
+
+<script TYPE="text/javascript">
+		// the function which handles the input field logic
+function getFields() {
+    document.getElementById('result');
+    var ecgField = document.getElementById('ecgField').value;
+    var cptField = document.getElementById('cptField').value;
+    var fttField = document.getElementById('fttField').value;
+    var sttField = document.getElementById('sttField').value;
+    var delta = sttField - fttField;
+    var result = document.getElementById('result');
+    var gecg = 0;
+    var gtrop = 0;
+    var age = document.getElementById('age').value;
+    var heartrate = document.getElementById('heartrate').value;
+    var bloodpress = document.getElementById('bloodpress').value;
+    var creat = document.getElementById('creat').value;
+    var killip = document.getElementById('killip').value;
+    var ooha = document.getElementById('ooha').value;
+    if (cptField === '' || fttField === '' || sttField === '') {
+                    alert("Please complete all fields");
+        return false;
+    }
+        document.getElementById('onehour').innerHTML = 'Troponin change over 1 hour was ' + delta;
+    if (ecgField === 'stchng' || ecgField === 'stup' || ecgField === 'stdown') {
+        gecg = 28;
+    }
+    if (fttField > 5 || sttField > 5) {
+        gtrop = 14;
+    }
+    var gracescore = Number(age) + Number(heartrate) + Number(bloodpress) + Number(creat) + Number(killip) + Number(ooha) + gecg + gtrop;
+        //gscore.textContent = 'Grace score was ' + gracescore;
+    if (ecgField === 'stchng') {
+        document.getElementById('result').innerHTML = 'Discuss with Cardiology SpR on call, bleep 6527';
+		document.getElementById('advice').innerHTML = '';
+		document.getElementById('advice2').innerHTML = '';
+    } else if (ecgField === 'stup') {
+        document.getElementById('result').innerHTML = 'Discuss IMMEDIATELY with Cath Labs ext 26649';
+		document.getElementById('advice').innerHTML = '';
+		document.getElementById('advice2').innerHTML = '';
+    } else if (cptField < 3) {
+        document.getElementById('result').innerHTML = 'Repeat baseline troponin at 3hrs from pain';
+		document.getElementById('advice').innerHTML = '';
+		document.getElementById('advice2').innerHTML = '';
+    } else if (fttField > 52) {
+        document.getElementById('result').innerHTML = 'ACS confirmed with a GRACE score of ' + gracescore;
+        document.getElementById('advice').innerHTML = 'Refer to full protocol for further guidance';
+		document.getElementById('advice2').innerHTML = '';
+    } else if (fttField < 6) {
+        document.getElementById('result').innerHTML = 'ACS ruled out';
+		document.getElementById('advice').innerHTML = 'Refer to ED guidance on referral to Chest Pain Clinic';
+        document.getElementById('advice2').innerHTML = '';
+    } else if (delta > 5) {
+        document.getElementById('result').innerHTML = 'ACS confirmed with a GRACE score of ' + gracescore;
+        document.getElementById('advice').innerHTML = 'Refer to full protocol for further guidance';
+        document.getElementById('advice2').innerHTML = '';
+    } else if (fttField < 12 && delta < 5) {
+        document.getElementById('result').innerHTML = 'ACS ruled out';
+        document.getElementById('advice').innerHTML = 'Refer to ED guidance on referral to Chest Pain Clinic';
+        document.getElementById('advice2').innerHTML = '';
+    } else {
+        document.getElementById('result').innerHTML = 'Indeterminate troponin result. GRACE score of ' + gracescore;
+        document.getElementById('advice').innerHTML = 'Consider review on cardiology PTWR';
+        document.getElementById('advice2').innerHTML = 'Refer to full protocol for further guidance';
+    }
+}
+// eventlistener for submit button
+var subButton = document.getElementById('subButton');
+if (subButton.addEventListener) {
+    subButton.addEventListener('click', getFields, false);
+} else if (subButton.attachEvent) {
+    subButton.attachEvent('onclick', getFields, false);
+}
+
+        </script>
+	</body>
+</html>
